@@ -107,7 +107,7 @@ public class MovieReviewService {
         List<Movie> movies = movieDao
                 .findByIds(movieIds)
                 .stream()
-                .filter(movie -> movie.getGeneres().contains(genre))
+                .filter(movie -> movie.getGenres().contains(genre))
                 .collect(Collectors.toList());
 
         List<Map.Entry<Integer, Integer>> sortedMap =
@@ -160,7 +160,7 @@ public class MovieReviewService {
         List<Movie> movies = movieDao
                 .findAll()
                 .stream()
-                .filter(movie -> movie.getGeneres().contains(genre))
+                .filter(movie -> movie.getGenres().contains(genre))
                 .collect(Collectors.toList());
 
         int sum = 0;
