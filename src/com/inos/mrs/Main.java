@@ -6,11 +6,10 @@ import com.inos.mrs.daos.UserDao;
 import com.inos.mrs.exceptions.MovieNotFoundException;
 import com.inos.mrs.exceptions.UserNotFoundException;
 import com.inos.mrs.services.MovieReviewService;
-import com.inos.mrs.utils.Genere;
+import com.inos.mrs.utils.Genre;
 import com.inos.mrs.utils.Role;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class Main {
 
@@ -20,12 +19,12 @@ public class Main {
         UserDao userDao = new UserDao();
         MovieReviewService movieReviewService = new MovieReviewService(movieDao, reviewDao, userDao);
 
-        movieReviewService.addMovie("Don", 2006, Genere.ACTION, Genere.COMEDY);
-        movieReviewService.addMovie("Tiger", 2008, Genere.DRAMA);
-        movieReviewService.addMovie("Padmaavat", 2006, Genere.COMEDY);
-        movieReviewService.addMovie("Lunchbox", 2021, Genere.DRAMA);
-        movieReviewService.addMovie("Guru", 2006, Genere.DRAMA);
-        movieReviewService.addMovie("Metro", 2006, Genere.ROMANCE);
+        movieReviewService.addMovie("Don", 2006, Genre.ACTION, Genre.COMEDY);
+        movieReviewService.addMovie("Tiger", 2008, Genre.DRAMA);
+        movieReviewService.addMovie("Padmaavat", 2006, Genre.COMEDY);
+        movieReviewService.addMovie("Lunchbox", 2021, Genre.DRAMA);
+        movieReviewService.addMovie("Guru", 2006, Genre.DRAMA);
+        movieReviewService.addMovie("Metro", 2006, Genre.ROMANCE);
 
         movieReviewService.addUser("SRK");
         movieReviewService.addUser("Salman");
@@ -50,7 +49,7 @@ public class Main {
         );
 
         System.out.println(
-                movieReviewService.getTopMoviesByGenre(1, Role.VIEWER, Genere.DRAMA)
+                movieReviewService.getTopMoviesByGenre(1, Role.VIEWER, Genre.DRAMA)
         );
 
         System.out.println(

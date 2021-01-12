@@ -1,6 +1,6 @@
 package com.inos.mrs.entities;
 
-import com.inos.mrs.utils.Genere;
+import com.inos.mrs.utils.Genre;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,19 +9,19 @@ public class Movie {
     private Integer id;
     private String name;
     private LocalDate releasedDate;
-    private List<Genere> generes;
+    private List<Genre> genres;
 
-    public Movie(String name, LocalDate releasedDate, List<Genere> generes) {
+    public Movie(String name, LocalDate releasedDate, List<Genre> genres) {
         this.name = name;
         this.releasedDate = releasedDate;
-        this.generes = generes;
+        this.genres = genres;
     }
 
     public Movie(Movie movie) {
         this.id = movie.getId();
         this.name = movie.getName();
         this.releasedDate = movie.getReleasedDate();
-        this.generes = movie.getGeneres();
+        this.genres = movie.getGeneres();
     }
 
     public Integer getId() {
@@ -48,12 +48,12 @@ public class Movie {
         this.releasedDate = releasedDate;
     }
 
-    public List<Genere> getGeneres() {
-        return generes;
+    public List<Genre> getGeneres() {
+        return genres;
     }
 
-    public void setGeneres(List<Genere> generes) {
-        this.generes = generes;
+    public void setGeneres(List<Genre> genres) {
+        this.genres = genres;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class Movie {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", releasedDate=" + releasedDate +
-                ", generes=" + generes +
+                ", genres=" + genres +
                 '}';
     }
 }

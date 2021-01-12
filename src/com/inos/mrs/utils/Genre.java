@@ -1,5 +1,5 @@
 package com.inos.mrs.utils;
 
-public enum Genere {
+public enum Genre {
     ACTION, COMEDY, DRAMA, ROMANCE
 }

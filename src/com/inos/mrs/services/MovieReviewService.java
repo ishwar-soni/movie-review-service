@@ -8,7 +8,7 @@ import com.inos.mrs.entities.Review;
 import com.inos.mrs.entities.User;
 import com.inos.mrs.exceptions.MovieNotFoundException;
 import com.inos.mrs.exceptions.UserNotFoundException;
-import com.inos.mrs.utils.Genere;
+import com.inos.mrs.utils.Genre;
 import com.inos.mrs.utils.Role;
 
 import java.time.LocalDate;
@@ -31,11 +31,11 @@ public class MovieReviewService {
         return userDao.create(user);
     }
 
-    public Movie addMovie(String name, int year, Genere... generes) {
+    public Movie addMovie(String name, int year, Genre... genres) {
         Movie movie = new Movie(
                 name,
                 LocalDate.of(year, 1, 1),
-                Arrays.stream(generes).collect(Collectors.toList()));
+                Arrays.stream(genres).collect(Collectors.toList()));
         return movieDao.create(movie);
     }
 
@@ -95,7 +95,7 @@ public class MovieReviewService {
         return result;
     }
 
-    public List<Movie> getTopMoviesByGenre(int n, Role role, Genere genere) throws MovieNotFoundException {
+    public List<Movie> getTopMoviesByGenre(int n, Role role, Genre genre) throws MovieNotFoundException {
         Map<Integer, Integer> moviesMap = reviewDao
                 .findAll()
                 .stream()
@@ -107,7 +107,7 @@ public class MovieReviewService {
         List<Movie> movies = movieDao
                 .findByIds(movieIds)
                 .stream()
-                .filter(movie -> movie.getGeneres().contains(genere))
+                .filter(movie -> movie.getGeneres().contains(genre))
                 .collect(Collectors.toList());
 
         List<Map.Entry<Integer, Integer>> sortedMap =
@@ -156,11 +156,11 @@ public class MovieReviewService {
         return sum * 1.0 / count;
     }
 
-    public double getAverageByGenre(Genere genere) throws MovieNotFoundException {
+    public double getAverageByGenre(Genre genre) throws MovieNotFoundException {
         List<Movie> movies = movieDao
                 .findAll()
                 .stream()
-                .filter(movie -> movie.getGeneres().contains(genere))
+                .filter(movie -> movie.getGeneres().contains(genre))
                 .collect(Collectors.toList());
 
         int sum = 0;
