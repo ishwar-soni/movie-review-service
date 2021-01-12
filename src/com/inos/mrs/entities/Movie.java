@@ -4,6 +4,7 @@ import com.inos.mrs.utils.Genre;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 public class Movie {
     private Integer id;

@@ -16,17 +16,16 @@ public class UserDao {
 
     public User create(User user) {
         user.setId(IdCounter.getId());
-        users.add(new User(user));
+        users.add(user);
         return user;
     }
 
     public User findByName(String name) throws UserNotFoundException {
-        User result = users
+        return users
                 .stream()
                 .filter(user -> user.getName().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("User with username: [" + name + "] not found."));
-        return new User(result);
     }
 
     public User update(User updatedUser) throws UserNotFoundException {

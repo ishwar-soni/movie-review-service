@@ -4,22 +4,22 @@ import com.inos.mrs.utils.Role;
 
 public class Review {
     private Integer id;
-    private int userId;
-    private int movieId;
+    private User user;
+    private Movie movie;
     private int score;
     private Role userRole;
 
-    public Review(int userId, int movieId, int score, Role userRole) {
-        this.userId = userId;
-        this.movieId = movieId;
+    public Review(User user, Movie movie, int score, Role userRole) {
+        this.user = user;
+        this.movie = movie;
         this.score = score;
         this.userRole = userRole;
     }
 
     public Review(Review review) {
         this.id = review.getId();
-        this.userId = review.getUserId();
-        this.movieId = review.getMovieId();
+        this.user = review.getUser();
+        this.movie = review.getMovie();
         this.score = review.getScore();
         this.userRole = review.getUserRole();
     }
@@ -32,20 +32,20 @@ public class Review {
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public int getMovieId() {
-        return movieId;
+    public Movie getMovie() {
+        return movie;
     }
 
-    public void setMovieId(int movieId) {
-        this.movieId = movieId;
+    public void setMovie(Movie movie) {
+        this.movie = movie;
     }
 
     public int getScore() {
@@ -68,8 +68,8 @@ public class Review {
     public String toString() {
         return "Review{" +
                 "id=" + id +
-                ", userId=" + userId +
-                ", movieId=" + movieId +
+                ", user=" + user +
+                ", movie=" + movie +
                 ", score=" + score +
                 ", userRole=" + userRole +
                 '}';

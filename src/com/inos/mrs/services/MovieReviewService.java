@@ -14,6 +14,7 @@ import com.inos.mrs.utils.Role;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MovieReviewService {
     private final MovieDao movieDao;
@@ -43,11 +44,11 @@ public class MovieReviewService {
             throws UserNotFoundException, MovieNotFoundException {
         User user = userDao.findByName(userName);
         Movie movie = movieDao.findByName(movieName);
-        Review review = new Review(user.getId(), movie.getId(), score, user.getRole());
+        Review review = new Review(user, movie, score, user.getRole());
 
         Review result = reviewDao.create(review);
 
-        List<Review> reviews = reviewDao.findByUserId(user.getId());
+        List<Review> reviews = reviewDao.findByUser(user);
         if (reviews.size() >= 3) {
             user.setRole(Role.CRITIC);
             userDao.update(user);
@@ -56,144 +57,84 @@ public class MovieReviewService {
         return result;
     }
 
-    public List<Movie> getTopMoviesInYear(int n, Role role, LocalDate releasedDate) throws MovieNotFoundException {
-        Map<Integer, Integer> moviesMap = reviewDao
+    public List<Map.Entry<Movie, Integer>> getTopMoviesInYear(int n, Role role, LocalDate releasedDate) throws MovieNotFoundException {
+        return new ArrayList<>(reviewDao
                 .findAll()
                 .stream()
                 .filter(review -> review.getUserRole() == role)
-                .collect(Collectors.toMap(Review::getMovieId, Review::getScore, Integer::sum));
-
-        List<Integer> movieIds = new ArrayList<>(moviesMap.keySet());
-
-        List<Movie> movies = movieDao
-                .findByIds(movieIds)
+                .filter(review -> review.getMovie().getReleasedDate().getYear() == releasedDate.getYear())
+                .collect(Collectors.toMap(
+                        Review::getMovie,
+                        review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore() : review.getScore(),
+                        Integer::sum))
+                .entrySet())
                 .stream()
-                .filter(movie -> movie.getReleasedDate().getYear() == releasedDate.getYear())
+                .sorted((a, b) -> -a.getValue() + b.getValue())
+                .limit(n)
                 .collect(Collectors.toList());
-
-        List<Map.Entry<Integer, Integer>> sortedMap =
-                new ArrayList<>(moviesMap.entrySet())
-                        .stream()
-                        .sorted((a, b) -> -a.getValue() + b.getValue())
-                        .collect(Collectors.toList());
-
-        List<Movie> result = new ArrayList<>();
-
-        for (Map.Entry<Integer, Integer> entry: sortedMap) {
-            Movie temp = movies
-                    .stream()
-                    .filter(movie -> movie.getId().equals(entry.getKey()))
-                    .findFirst()
-                    .orElse(null);
-            if (temp != null) {
-                result.add(temp);
-                n--;
-            }
-            if (n == 0) break;
-        }
-
-        return result;
     }
 
-    public List<Movie> getTopMoviesByGenre(int n, Role role, Genre genre) throws MovieNotFoundException {
-        Map<Integer, Integer> moviesMap = reviewDao
+    public List<Map.Entry<Movie, Integer>> getTopMoviesByGenre(int n, Role role, Genre genre) throws MovieNotFoundException {
+        return new ArrayList<>(reviewDao
                 .findAll()
                 .stream()
                 .filter(review -> review.getUserRole() == role)
-                .collect(Collectors.toMap(Review::getMovieId, Review::getScore, Integer::sum));
-
-        List<Integer> movieIds = new ArrayList<>(moviesMap.keySet());
-
-        List<Movie> movies = movieDao
-                .findByIds(movieIds)
+                .filter(review -> review.getMovie().getGenres().contains(genre))
+                .collect(Collectors.toMap(
+                        Review::getMovie,
+                        review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore() : review.getScore(),
+                        Integer::sum))
+                .entrySet())
                 .stream()
-                .filter(movie -> movie.getGenres().contains(genre))
+                .sorted((a, b) -> -a.getValue() + b.getValue())
+                .limit(n)
                 .collect(Collectors.toList());
-
-        List<Map.Entry<Integer, Integer>> sortedMap =
-                new ArrayList<>(moviesMap.entrySet())
-                        .stream()
-                        .sorted((a, b) -> -a.getValue() + b.getValue())
-                        .collect(Collectors.toList());
-
-        List<Movie> result = new ArrayList<>();
-
-        for (Map.Entry<Integer, Integer> entry: sortedMap) {
-            Movie temp = movies
-                    .stream()
-                    .filter(movie -> movie.getId().equals(entry.getKey()))
-                    .findFirst()
-                    .orElse(null);
-            if (temp != null) {
-                result.add(temp);
-                n--;
-            }
-            if (n == 0) break;
-        }
-
-        return result;
     }
 
     public double getAverageByYear(LocalDate localDate) throws MovieNotFoundException {
-        List<Movie> movies = movieDao
+
+        int sum = reviewDao
                 .findAll()
                 .stream()
-                .filter(movie -> movie.getReleasedDate().getYear() == localDate.getYear())
-                .collect(Collectors.toList());
+                .filter(review -> review.getMovie().getReleasedDate().getYear() == localDate.getYear())
+                .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore() : review.getScore())
+                .reduce(0, Integer::sum);
 
-        int sum = 0;
-        int count = 0;
-
-        for (Movie movie: movies) {
-            List<Review> reviews = reviewDao.findByMovieId(movie.getId());
-            sum += reviews
-                    .stream()
-                    .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore(): review.getScore())
-                    .reduce(0, Integer::sum);
-            count += reviews.size();
-        }
+        long count = reviewDao
+                .findAll()
+                .stream()
+                .filter(review -> review.getMovie().getReleasedDate().getYear() == localDate.getYear())
+                .count();
 
         return sum * 1.0 / count;
     }
 
     public double getAverageByGenre(Genre genre) throws MovieNotFoundException {
-        List<Movie> movies = movieDao
+        Stream<Review> reviews = reviewDao
                 .findAll()
                 .stream()
-                .filter(movie -> movie.getGenres().contains(genre))
-                .collect(Collectors.toList());
+                .filter(review -> review.getMovie().getGenres().contains(genre));
 
-        int sum = 0;
-        int count = 0;
+        int sum = reviews
+                .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore() : review.getScore())
+                .reduce(0, Integer::sum);
 
-        for (Movie movie: movies) {
-            List<Review> reviews = reviewDao.findByMovieId(movie.getId());
-            sum += reviews.stream()
-                    .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore(): review.getScore())
-                    .reduce(0, Integer::sum);
-            count += reviews.size();
-        }
+        long count = reviews.count();
 
         return sum * 1.0 / count;
     }
 
     public double getAverageByMovie(String name) throws MovieNotFoundException {
-        List<Movie> movies = movieDao
+        Stream<Review> reviews = reviewDao
                 .findAll()
                 .stream()
-                .filter(movie -> movie.getName().equals(name))
-                .collect(Collectors.toList());
+                .filter(review -> review.getMovie().getName().equals(name));
 
-        int sum = 0;
-        int count = 0;
+        int sum = reviews
+                .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore() : review.getScore())
+                .reduce(0, Integer::sum);
 
-        for (Movie movie: movies) {
-            List<Review> reviews = reviewDao.findByMovieId(movie.getId());
-            sum += reviews.stream()
-                    .map(review -> review.getUserRole()==Role.CRITIC ? 2*review.getScore(): review.getScore())
-                    .reduce(0, Integer::sum);
-            count += reviews.size();
-        }
+        long count = reviews.count();
 
         return sum * 1.0 / count;
     }

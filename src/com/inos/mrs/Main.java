@@ -3,6 +3,7 @@ package com.inos.mrs;
 import com.inos.mrs.daos.MovieDao;
 import com.inos.mrs.daos.ReviewDao;
 import com.inos.mrs.daos.UserDao;
+import com.inos.mrs.entities.Movie;
 import com.inos.mrs.exceptions.MovieNotFoundException;
 import com.inos.mrs.exceptions.UserNotFoundException;
 import com.inos.mrs.services.MovieReviewService;
@@ -10,6 +11,8 @@ import com.inos.mrs.utils.Genre;
 import com.inos.mrs.utils.Role;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -40,18 +43,22 @@ public class Main {
         movieReviewService.addReview("SRK", "Tiger", 5);
         movieReviewService.addReview("SRK", "Metro", 7);
 
-        System.out.println(
-                movieReviewService.getTopMoviesInYear(1, Role.VIEWER, LocalDate.of(2006, 1, 1))
-        );
+        System.out.println("List top 1 movie by review score in “2006” year (By Viewer):");
+        movieReviewService
+                .getTopMoviesInYear(1, Role.VIEWER, LocalDate.of(2006, 1, 1))
+                .forEach(entry -> System.out.println(entry.getKey().getName() + " - " + entry.getValue()));
 
-        System.out.println(
-                movieReviewService.getTopMoviesInYear(1, Role.CRITIC, LocalDate.of(2006, 1, 1))
-        );
+        System.out.println("List top 1 movie by review score in “2006” year (By Critic):");
+        movieReviewService
+                .getTopMoviesInYear(1, Role.CRITIC, LocalDate.of(2006, 1, 1))
+                .forEach(entry -> System.out.println(entry.getKey().getName() + " - " + entry.getValue()));
 
-        System.out.println(
-                movieReviewService.getTopMoviesByGenre(1, Role.VIEWER, Genre.DRAMA)
-        );
+        System.out.println("List top 1 movie by review score in “Drama” genre:");
+        movieReviewService
+                .getTopMoviesByGenre(1, Role.VIEWER, Genre.DRAMA)
+                .forEach(entry -> System.out.println(entry.getKey().getName() + " - " + entry.getValue()));
 
+        System.out.println("Average review score in 2016:");
         System.out.println(
                 movieReviewService.getAverageByYear(LocalDate.of(2006, 1, 1))
         );

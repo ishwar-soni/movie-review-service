@@ -1,6 +1,8 @@
 package com.inos.mrs.daos;
 
+import com.inos.mrs.entities.Movie;
 import com.inos.mrs.entities.Review;
+import com.inos.mrs.entities.User;
 import com.inos.mrs.utils.IdCounter;
 
 import java.util.ArrayList;
@@ -16,39 +18,25 @@ public class ReviewDao {
 
     public Review create(Review review) {
         review.setId(IdCounter.getId());
-        reviews.add(new Review(review));
+        reviews.add(review);
         return review;
     }
 
-    public List<Review> findByUserId(int userId) {
-        List<Review> temp = reviews
+    public List<Review> findByUser(User user) {
+        return reviews
                 .stream()
-                .filter(review -> review.getUserId() == userId)
+                .filter(review -> review.getUser().getId().equals(user.getId()))
                 .collect(Collectors.toList());
-        List<Review> result = new ArrayList<>();
-        for (Review review: temp) {
-            result.add(new Review(review));
-        }
-        return result;
     }
 
     public List<Review> findAll() {
-        List<Review> result = new ArrayList<>();
-        for (Review review: reviews) {
-            result.add(new Review(review));
-        }
-        return result;
+        return reviews;
     }
 
-    public List<Review> findByMovieId(int movieId) {
-        List<Review> temp = reviews
+    public List<Review> findByMovie(Movie movie) {
+        return reviews
                 .stream()
-                .filter(review -> review.getMovieId() == movieId)
+                .filter(review -> review.getMovie().getId().equals(movie.getId()))
                 .collect(Collectors.toList());
-        List<Review> result = new ArrayList<>();
-        for (Review review: temp) {
-            result.add(new Review(review));
-        }
-        return result;
     }
 }
